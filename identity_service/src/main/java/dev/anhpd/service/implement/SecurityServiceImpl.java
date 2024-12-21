@@ -1,4 +1,4 @@
-package dev.anhpd.service;
+package dev.anhpd.service.implement;
 
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
@@ -13,6 +13,7 @@ import dev.anhpd.entity.model.User;
 import dev.anhpd.exception.AppException;
 import dev.anhpd.exception.ErrorCode;
 import dev.anhpd.repository.UserRepository;
+import dev.anhpd.service.SecurityService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -102,9 +103,9 @@ public class SecurityServiceImpl implements SecurityService {
     }
     public String buildScope(User user) {
         StringJoiner stringJoiner = new StringJoiner(" ");
-        if(!user.getRole().isEmpty()){
-            user.getRole().forEach(stringJoiner::add);
-        }
+//        if(!user.getRole().isEmpty()){
+//            user.getRole().forEach(stringJoiner::add);
+//        }
         return stringJoiner.toString();
     }
 

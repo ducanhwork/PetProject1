@@ -25,7 +25,7 @@ import javax.crypto.spec.SecretKeySpec;
 public class SecurityConfig {
     @Value("${JWT_SIGNER_KEY}")
     private String signerKey;
-    private final String[] PUBLIC_ENDPOINTS = {"/api/auth/v1/**", "/api/user/v1/add"};
+    private final String[] PUBLIC_ENDPOINTS = {"/api/auth/v1/**", "/api/user/v1/add","/swagger-ui/**","/v3/api-docs/**"};
     private final String[] ADMIN_ENDPOINTS = {"/api/user/v1/delete"};
 
     @Bean

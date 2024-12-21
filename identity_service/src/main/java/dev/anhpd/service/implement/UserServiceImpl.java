@@ -1,4 +1,4 @@
-package dev.anhpd.service;
+package dev.anhpd.service.implement;
 
 import dev.anhpd.entity.dto.request.UserCreateRequest;
 import dev.anhpd.entity.dto.request.UserUpdateRequest;
@@ -8,6 +8,7 @@ import dev.anhpd.exception.AppException;
 import dev.anhpd.exception.ErrorCode;
 import dev.anhpd.mapper.UserMapper;
 import dev.anhpd.repository.UserRepository;
+import dev.anhpd.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +20,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import static java.rmi.server.LogStream.log;
@@ -29,7 +29,7 @@ import static lombok.AccessLevel.PRIVATE;
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 @Service
 @Slf4j
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
     UserRepository userRepository;
     UserMapper userMapper;
     PasswordEncoder passwordEncoder;
@@ -48,7 +48,7 @@ public class UserServiceImpl implements UserService{
     @PostAuthorize("returnObject.username == authentication.name")
     @Override
     public UserResponse getUserById(UUID id) {
-        User user = userRepository.findUserByUser_id(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        User user = userRepository.findUserById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         return userMapper.toUserResponse(user);
     }
 
@@ -61,7 +61,7 @@ public class UserServiceImpl implements UserService{
     public UserResponse createUser(UserCreateRequest request) {
         log(request.getUsername());
         User user = userMapper.fromCreatetoUser(request);
-        user.setRole(Set.of("USER"));
+//        user.setRole(Set.of("USER"));
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         userRepository.save(user);
         return userMapper.toUserResponse(user);
@@ -69,7 +69,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public UserResponse updateUser(UUID uuid,UserUpdateRequest user) throws Exception {
-        User us = userRepository.findUserByUser_id(uuid).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        User us = userRepository.findUserById(uuid).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         us = userMapper.fromUpdatetoUser(user,us);
         us.setPassword(passwordEncoder.encode(us.getPassword()));
         userRepository.save(us);
@@ -78,7 +78,7 @@ public class UserServiceImpl implements UserService{
     @PreAuthorize("hasRole('ADMIN')")
     @Override
     public void deleteUser(UUID id) throws Exception {
-        User us = userRepository.findUserByUser_id(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        User us = userRepository.findUserById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         userRepository.delete(us);
     }
 }

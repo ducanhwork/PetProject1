@@ -2,6 +2,7 @@ package dev.anhpd.entity.dto.response;
 
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import dev.anhpd.entity.model.Role;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,6 +21,6 @@ public class UserResponse {
     private String password;
     private String email;
     private LocalDate dob;
-    private Set<String> role;
+    private Set<Role> role;
     private boolean enabled;
 }
