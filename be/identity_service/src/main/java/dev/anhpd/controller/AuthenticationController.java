@@ -2,6 +2,7 @@ package dev.anhpd.controller;
 
 import dev.anhpd.entity.dto.request.AuthenticateRequest;
 import dev.anhpd.entity.dto.request.IntrospectRequest;
+import dev.anhpd.entity.dto.request.LogoutRequest;
 import dev.anhpd.entity.dto.response.ApiResponse;
 import dev.anhpd.service.implement.SecurityServiceImpl;
 import dev.anhpd.service.implement.UserServiceImpl;
@@ -10,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.text.ParseException;
 
 @RestController
 @RequestMapping("/api/auth/v1")
@@ -34,6 +37,15 @@ public class AuthenticationController {
         return ResponseEntity.ok(ApiResponse.builder()
                 .message("Authenticate successfully")
                 .data(response)
+                .code(200)
+                .build()
+        );
+    }
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse> logout(@RequestBody LogoutRequest request) throws ParseException {
+        securityService.logout(request);
+        return ResponseEntity.ok(ApiResponse.builder()
+                .message("Logout successfully")
                 .code(200)
                 .build()
         );
