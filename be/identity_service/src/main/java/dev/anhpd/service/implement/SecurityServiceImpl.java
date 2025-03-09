@@ -8,6 +8,7 @@ import com.nimbusds.jwt.SignedJWT;
 import dev.anhpd.entity.dto.request.AuthenticateRequest;
 import dev.anhpd.entity.dto.request.IntrospectRequest;
 import dev.anhpd.entity.dto.request.LogoutRequest;
+import dev.anhpd.entity.dto.request.RefeshRequest;
 import dev.anhpd.entity.dto.response.AuthenticateResponse;
 import dev.anhpd.entity.dto.response.IntrospectResponse;
 import dev.anhpd.entity.model.InvalidateToken;
@@ -119,6 +120,37 @@ public class SecurityServiceImpl implements SecurityService {
         //luu token vao db
         invalidateTokenRepository.save(invalidateToken);
 
+    }
+
+    /**
+     * Refresh token by using refresh token
+     * @param refreshToken
+     * @return
+     * @throws ParseException
+     */
+    @Override
+    public AuthenticateResponse refreshToken(RefeshRequest refreshToken) throws ParseException {
+        //kiem tra token co hop le khong
+        var signToken = verifyToken(refreshToken.getToken());
+        //lay thong tin user tu token
+        var jit = signToken.getJWTClaimsSet().getJWTID();
+        var expiration = signToken.getJWTClaimsSet().getExpirationTime();
+
+        InvalidateToken invalidateToken = InvalidateToken.builder()
+                .id(jit)
+                .expiryTime(expiration)
+                .build();
+        //luu invalidate token vao db
+        invalidateTokenRepository.save(invalidateToken);
+        //lay thong tin user tu token
+        String username = signToken.getJWTClaimsSet().getSubject();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        //tao token moi
+        return AuthenticateResponse.builder()
+                .token(generateToken(user))
+                .authenticated(true)
+                .build();
     }
 
     //kiem tra token

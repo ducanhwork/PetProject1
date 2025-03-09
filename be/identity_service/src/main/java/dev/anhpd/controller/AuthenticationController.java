@@ -3,6 +3,7 @@ package dev.anhpd.controller;
 import dev.anhpd.entity.dto.request.AuthenticateRequest;
 import dev.anhpd.entity.dto.request.IntrospectRequest;
 import dev.anhpd.entity.dto.request.LogoutRequest;
+import dev.anhpd.entity.dto.request.RefeshRequest;
 import dev.anhpd.entity.dto.response.ApiResponse;
 import dev.anhpd.service.implement.SecurityServiceImpl;
 import dev.anhpd.service.implement.UserServiceImpl;
@@ -46,6 +47,16 @@ public class AuthenticationController {
         securityService.logout(request);
         return ResponseEntity.ok(ApiResponse.builder()
                 .message("Logout successfully")
+                .code(200)
+                .build()
+        );
+    }
+    @PostMapping("/refresh")
+    public ResponseEntity<ApiResponse> refreshToken(@RequestBody RefeshRequest request) throws ParseException {
+        var response = securityService.refreshToken(request);
+        return ResponseEntity.ok(ApiResponse.builder()
+                .message("Refresh token successfully")
+                .data(response)
                 .code(200)
                 .build()
         );
