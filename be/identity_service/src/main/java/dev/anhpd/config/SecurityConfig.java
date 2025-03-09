@@ -1,5 +1,6 @@
 package dev.anhpd.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,24 +24,22 @@ import javax.crypto.spec.SecretKeySpec;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
-    @Value("${JWT_SIGNER_KEY}")
-    private String signerKey;
-    private final String[] PUBLIC_ENDPOINTS = {"/api/auth/v1/**", "/api/user/v1/add","/swagger-ui/**","/v3/api-docs/**"};
-    private final String[] ADMIN_ENDPOINTS = {"/api/user/v1/delete"};
 
+    private final String[] PUBLIC_ENDPOINTS = {"/api/auth/v1/**", "/api/user/v1/add","/swagger-ui/**","/v3/api-docs/**"};
+    @Autowired
+    private CustomJwtDecoder customJwtDecoder;
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         //config endpoint
         http.authorizeHttpRequests(request -> request
                 .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
-                .requestMatchers(HttpMethod.GET,ADMIN_ENDPOINTS).hasRole("ADMIN")
                 .anyRequest().authenticated()
         );
         //disable csrf
         http.csrf(AbstractHttpConfigurer::disable);
         //jwt
         http.oauth2ResourceServer(oauth2 -> oauth2
-                .jwt(jwtConfigurer -> jwtConfigurer.decoder(jwtDecoder())
+                .jwt(jwtConfigurer -> jwtConfigurer.decoder(customJwtDecoder)
                         .jwtAuthenticationConverter(jwtAuthenticationConverter())
                 )
                 .authenticationEntryPoint(new JWTAuthenticationEntryPoint())
@@ -48,14 +47,7 @@ public class SecurityConfig {
         return http.build();
     }
 
-    //jwt decoder
-    @Bean
-    JwtDecoder jwtDecoder() {
-        SecretKeySpec secretKeySpec = new SecretKeySpec(signerKey.getBytes(), "HS256");
-        return NimbusJwtDecoder.withSecretKey(secretKeySpec)
-                .macAlgorithm(MacAlgorithm.HS256)
-                .build();
-    }
+
 
     @Bean
     JwtAuthenticationConverter jwtAuthenticationConverter() {

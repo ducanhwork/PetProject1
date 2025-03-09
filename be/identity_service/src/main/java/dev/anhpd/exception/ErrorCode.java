@@ -19,8 +19,8 @@ public enum ErrorCode {
     NULL_INPUT("Input must be not null", 400, HttpStatus.BAD_REQUEST),
     LENGTH_USERNAME("Username must be between 5 and 50 characters", 400, HttpStatus.BAD_REQUEST),
     LENGTH_PASSWORD("Password must be at least 8 characters", 400, HttpStatus.BAD_REQUEST),
-    INVALID_DOB("Invalid date of birth, your age must be greater than {min}", 400, HttpStatus.BAD_REQUEST);
-
+    INVALID_DOB("Invalid date of birth, your age must be greater than {min}", 400, HttpStatus.BAD_REQUEST),
+    INVALID_TOKEN("Invalid token", 401, HttpStatus.UNAUTHORIZED);
 
     private String message;
     private int code;
