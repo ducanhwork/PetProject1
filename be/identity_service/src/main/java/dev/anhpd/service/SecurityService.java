@@ -3,6 +3,7 @@ package dev.anhpd.service;
 import dev.anhpd.entity.dto.request.AuthenticateRequest;
 import dev.anhpd.entity.dto.request.IntrospectRequest;
 import dev.anhpd.entity.dto.request.LogoutRequest;
+import dev.anhpd.entity.dto.request.RefeshRequest;
 import dev.anhpd.entity.dto.response.AuthenticateResponse;
 import dev.anhpd.entity.dto.response.IntrospectResponse;
 import dev.anhpd.entity.model.User;
@@ -14,4 +15,5 @@ public interface SecurityService {
     AuthenticateResponse authenticate(AuthenticateRequest request);
     String generateToken(User user);
     void logout(LogoutRequest request) throws ParseException;
+    AuthenticateResponse refreshToken(RefeshRequest refreshToken) throws ParseException;
 }
