@@ -1,6 +1,8 @@
 package dev.anhpd.config;
 
+import dev.anhpd.entity.model.Role;
 import dev.anhpd.entity.model.User;
+import dev.anhpd.repository.RoleRepository;
 import dev.anhpd.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -21,16 +23,19 @@ public class ApplicationInitConfig {
     PasswordEncoder passwordEncoder;
     //tao ra admin co san
     @Bean
-    ApplicationRunner applicationRunner(UserRepository userRepository) {
+    ApplicationRunner applicationRunner(UserRepository userRepository, RoleRepository roleRepository) {
         return args -> {
             if (userRepository.findByUsername("admin").isEmpty()) {
-                var roles = new HashSet<String>();
-                roles.add("ADMIN");
                 User user = new User();
                 user.setFullname("Phan Duc Anh");
                 user.setUsername("admin");
                 user.setPassword(passwordEncoder.encode("admin"));
-//                user.setRole(roles);
+                //set role admin cho user
+                user.setRoles(new HashSet<>(roleRepository.findById("ADMIN").map(role -> {
+                    var roles = new HashSet<Role>();
+                    roles.add(role);
+                    return roles;
+                }).orElseThrow()));
                 userRepository.save(user);
                 log.warn("admin user has been created with default password : admin, please change password");
             }

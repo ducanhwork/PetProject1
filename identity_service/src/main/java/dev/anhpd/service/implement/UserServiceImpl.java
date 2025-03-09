@@ -7,6 +7,7 @@ import dev.anhpd.entity.model.User;
 import dev.anhpd.exception.AppException;
 import dev.anhpd.exception.ErrorCode;
 import dev.anhpd.mapper.UserMapper;
+import dev.anhpd.repository.RoleRepository;
 import dev.anhpd.repository.UserRepository;
 import dev.anhpd.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -18,9 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static java.rmi.server.LogStream.log;
 import static lombok.AccessLevel.PRIVATE;
@@ -30,6 +29,7 @@ import static lombok.AccessLevel.PRIVATE;
 @Service
 @Slf4j
 public class UserServiceImpl implements UserService {
+    RoleRepository roleRepository;
     UserRepository userRepository;
     UserMapper userMapper;
     PasswordEncoder passwordEncoder;
@@ -61,7 +61,7 @@ public class UserServiceImpl implements UserService {
     public UserResponse createUser(UserCreateRequest request) {
         log(request.getUsername());
         User user = userMapper.fromCreatetoUser(request);
-//        user.setRole(Set.of("USER"));
+        user.setRoles(Set.of(roleRepository.findById("USER").orElseThrow()));
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         userRepository.save(user);
         return userMapper.toUserResponse(user);
@@ -72,6 +72,8 @@ public class UserServiceImpl implements UserService {
         User us = userRepository.findUserById(uuid).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         us = userMapper.fromUpdatetoUser(user,us);
         us.setPassword(passwordEncoder.encode(us.getPassword()));
+        var roles = roleRepository.findAllById(user.getRoles());
+        us.setRoles(new HashSet<>(roles));
         userRepository.save(us);
         return userMapper.toUserResponse(us);
     }

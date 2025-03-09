@@ -12,6 +12,7 @@ import org.hibernate.validator.constraints.Length;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -33,4 +34,5 @@ public class UserUpdateRequest {
     @JsonFormat(pattern = "dd/MM/yyyy")
     private LocalDate dob;
     private boolean enabled = true;
+    private List<String> roles;
 }

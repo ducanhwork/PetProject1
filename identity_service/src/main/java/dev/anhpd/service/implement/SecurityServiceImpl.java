@@ -21,10 +21,12 @@ import lombok.experimental.NonFinal;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Collections;
 import java.util.Date;
 import java.util.StringJoiner;
 import java.util.UUID;
@@ -101,11 +103,18 @@ public class SecurityServiceImpl implements SecurityService {
             throw new RuntimeException(e);
         }
     }
+    //tao scope cho token
     public String buildScope(User user) {
         StringJoiner stringJoiner = new StringJoiner(" ");
-//        if(!user.getRole().isEmpty()){
-//            user.getRole().forEach(stringJoiner::add);
-//        }
+        if (!CollectionUtils.isEmpty(user.getRoles())) {
+            user.getRoles().forEach(role -> {
+                        stringJoiner.add(role.getName());
+                        if (!CollectionUtils.isEmpty(role.getPermissions())) {
+                            role.getPermissions().forEach(permission -> stringJoiner.add(permission.getName()));
+                        }
+                    }
+            );
+        }
         return stringJoiner.toString();
     }
 
