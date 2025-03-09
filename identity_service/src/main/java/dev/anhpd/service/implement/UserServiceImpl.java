@@ -34,7 +34,9 @@ public class UserServiceImpl implements UserService {
     UserMapper userMapper;
     PasswordEncoder passwordEncoder;
     @Override
-    @PreAuthorize("hasRole('ADMIN')")
+//    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('CREATE_POST')")
+
     public List<UserResponse> getAllUsers() {
         var auth = SecurityContextHolder.getContext().getAuthentication();
         auth.getAuthorities().forEach(System.out::println);
