@@ -1,25 +1,25 @@
 package dev.anhpd.controller;
 
-import dev.anhpd.entity.dto.request.UserUpdateRequest;
-import dev.anhpd.exception.ErrorCode;
-import dev.anhpd.entity.dto.request.UserCreateRequest;
-import dev.anhpd.entity.dto.response.ApiResponse;
-import dev.anhpd.entity.dto.response.UserResponse;
-import dev.anhpd.service.implement.UserServiceImpl;
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
-import io.swagger.v3.oas.annotations.info.Info;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
+import static lombok.AccessLevel.PRIVATE;
 
 import java.util.List;
 import java.util.UUID;
 
-import static lombok.AccessLevel.PRIVATE;
+import jakarta.validation.Valid;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
+
+import dev.anhpd.entity.dto.request.UserCreateRequest;
+import dev.anhpd.entity.dto.request.UserUpdateRequest;
+import dev.anhpd.entity.dto.response.ApiResponse;
+import dev.anhpd.entity.dto.response.UserResponse;
+import dev.anhpd.exception.ErrorCode;
+import dev.anhpd.service.implement.UserServiceImpl;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
@@ -28,7 +28,7 @@ import static lombok.AccessLevel.PRIVATE;
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public class UserController {
     UserServiceImpl userService;
-    //Get All Users
+    // Get All Users
     @GetMapping("/users")
     public ResponseEntity<ApiResponse> getAllUsers() {
         log.info("Get all users");
@@ -40,43 +40,41 @@ public class UserController {
                 .message(ErrorCode.USERS_FOUND.getMessage())
                 .data(listUser)
                 .code(ErrorCode.USERS_FOUND.getCode())
-                .build()
-        );
+                .build());
     }
 
-    //Create a user
+    // Create a user
     @PostMapping("/add")
     public ResponseEntity<ApiResponse> createUser(@RequestBody @Valid UserCreateRequest user) {
+        log.info("Controller: create user");
         UserResponse userResponse = userService.createUser(user);
         return ResponseEntity.ok(ApiResponse.builder()
                 .message("User created successfully")
                 .data(userResponse)
                 .code(200)
-                .build()
-        );
+                .build());
     }
-    //Update user
+    // Update user
     @PutMapping("/update/{user_id}")
-    public ResponseEntity<ApiResponse> updateUser(@PathVariable("user_id") UUID uuid, @RequestBody @Valid UserUpdateRequest user) throws Exception {
-        UserResponse userResponse = userService.updateUser(uuid,user);
+    public ResponseEntity<ApiResponse> updateUser(
+            @PathVariable("user_id") UUID uuid, @RequestBody @Valid UserUpdateRequest user) throws Exception {
+        UserResponse userResponse = userService.updateUser(uuid, user);
         return ResponseEntity.ok(ApiResponse.builder()
                 .message("User updated successfully")
                 .data(userResponse)
                 .code(200)
-                .build()
-        );
+                .build());
     }
-    //Delete user
+    // Delete user
     @DeleteMapping("/delete/{user_id}")
     public ResponseEntity<ApiResponse> deleteUser(@PathVariable("user_id") UUID id) throws Exception {
         userService.deleteUser(id);
         return ResponseEntity.ok(ApiResponse.builder()
                 .message("User deleted successfully")
                 .code(200)
-                .build()
-        );
+                .build());
     }
-    //Get user by id
+    // Get user by id
     @GetMapping("/get/{user_id}")
     public ResponseEntity<ApiResponse> getUserById(@PathVariable("user_id") UUID id) {
         UserResponse userResponse = userService.getUserById(id);
@@ -84,9 +82,6 @@ public class UserController {
                 .message("User found successfully")
                 .data(userResponse)
                 .code(200)
-                .build()
-        );
+                .build());
     }
-
-
 }
