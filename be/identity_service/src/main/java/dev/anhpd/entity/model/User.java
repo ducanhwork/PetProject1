@@ -1,11 +1,12 @@
 package dev.anhpd.entity.model;
 
-import jakarta.persistence.*;
-import lombok.*;
-
 import java.time.LocalDate;
 import java.util.Set;
 import java.util.UUID;
+
+import jakarta.persistence.*;
+
+import lombok.*;
 
 @Entity
 @Data
@@ -17,15 +18,22 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
+
     @Column(nullable = false)
     private String fullname;
+
     @Column(nullable = false, unique = true)
     private String username;
+
     private String password;
+
     @Column(unique = true)
     private String email;
+
     private LocalDate dob;
+
     @ManyToMany
     private Set<Role> roles;
+
     private boolean enabled = true;
 }

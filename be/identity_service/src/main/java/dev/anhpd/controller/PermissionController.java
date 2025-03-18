@@ -1,5 +1,9 @@
 package dev.anhpd.controller;
 
+import java.util.List;
+
+import org.springframework.web.bind.annotation.*;
+
 import dev.anhpd.entity.dto.request.PermissionRequest;
 import dev.anhpd.entity.dto.response.ApiResponse;
 import dev.anhpd.entity.dto.response.PermissionResponse;
@@ -8,9 +12,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,6 +31,7 @@ public class PermissionController {
                 .message("Create permission successfully")
                 .build();
     }
+
     @GetMapping
     ApiResponse<List<PermissionResponse>> getAll() {
         log.info("Get all permissions");
@@ -40,6 +42,7 @@ public class PermissionController {
                 .message("Get all permissions successfully")
                 .build();
     }
+
     @DeleteMapping("/{name}")
     ApiResponse<Void> delete(@PathVariable String name) {
         log.info("Delete permission: {}", name);

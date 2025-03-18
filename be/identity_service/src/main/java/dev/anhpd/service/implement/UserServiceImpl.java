@@ -1,5 +1,16 @@
 package dev.anhpd.service.implement;
 
+import static java.rmi.server.LogStream.log;
+import static lombok.AccessLevel.PRIVATE;
+
+import java.util.*;
+
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
 import dev.anhpd.entity.dto.request.UserCreateRequest;
 import dev.anhpd.entity.dto.request.UserUpdateRequest;
 import dev.anhpd.entity.dto.response.UserResponse;
@@ -13,16 +24,6 @@ import dev.anhpd.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.prepost.PostAuthorize;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
-import java.util.*;
-
-import static java.rmi.server.LogStream.log;
-import static lombok.AccessLevel.PRIVATE;
 
 @RequiredArgsConstructor
 @FieldDefaults(level = PRIVATE, makeFinal = true)
@@ -33,10 +34,10 @@ public class UserServiceImpl implements UserService {
     UserRepository userRepository;
     UserMapper userMapper;
     PasswordEncoder passwordEncoder;
-    @Override
-//    @PreAuthorize("hasRole('ADMIN')")
-    @PreAuthorize("hasAuthority('CREATE_POST')")
 
+    @Override
+    //    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('CREATE_POST')")
     public List<UserResponse> getAllUsers() {
         var auth = SecurityContextHolder.getContext().getAuthentication();
         auth.getAuthorities().forEach(System.out::println);
@@ -45,8 +46,9 @@ public class UserServiceImpl implements UserService {
         for (User user : listUser) {
             userResponses.add(userMapper.toUserResponse(user));
         }
-       return userResponses;
+        return userResponses;
     }
+
     @PostAuthorize("returnObject.username == authentication.name")
     @Override
     public UserResponse getUserById(UUID id) {
@@ -61,7 +63,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse createUser(UserCreateRequest request) {
-        log(request.getUsername());
+        log.info("Service: create user");
         User user = userMapper.fromCreatetoUser(request);
         user.setRoles(Set.of(roleRepository.findById("USER").orElseThrow()));
         user.setPassword(passwordEncoder.encode(request.getPassword()));
@@ -70,15 +72,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponse updateUser(UUID uuid,UserUpdateRequest user) throws Exception {
+    public UserResponse updateUser(UUID uuid, UserUpdateRequest user) throws Exception {
         User us = userRepository.findUserById(uuid).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-        us = userMapper.fromUpdatetoUser(user,us);
+        us = userMapper.fromUpdatetoUser(user, us);
         us.setPassword(passwordEncoder.encode(us.getPassword()));
         var roles = roleRepository.findAllById(user.getRoles());
         us.setRoles(new HashSet<>(roles));
         userRepository.save(us);
         return userMapper.toUserResponse(us);
     }
+
     @PreAuthorize("hasRole('ADMIN')")
     @Override
     public void deleteUser(UUID id) throws Exception {

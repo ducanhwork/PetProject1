@@ -1,11 +1,12 @@
 package dev.anhpd.entity.model;
 
+import java.util.Date;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.util.Date;
 
 @Entity
 @Data
@@ -18,5 +19,6 @@ import java.util.Date;
 public class InvalidateToken {
     @Id
     String id;
+
     Date expiryTime;
 }

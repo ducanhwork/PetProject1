@@ -1,5 +1,9 @@
 package dev.anhpd.service.implement;
 
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
 import dev.anhpd.entity.dto.request.PermissionRequest;
 import dev.anhpd.entity.dto.response.PermissionResponse;
 import dev.anhpd.entity.model.Permission;
@@ -9,9 +13,6 @@ import dev.anhpd.service.PermissionService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -38,6 +39,4 @@ public class PermissionServiceImpl implements PermissionService {
     public void delete(String name) {
         permissionRepository.deleteById(name);
     }
-
-
 }

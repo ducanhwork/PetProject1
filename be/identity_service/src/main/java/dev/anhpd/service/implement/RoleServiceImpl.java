@@ -1,5 +1,10 @@
 package dev.anhpd.service.implement;
 
+import java.util.HashSet;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
 import dev.anhpd.entity.dto.request.RoleRequest;
 import dev.anhpd.entity.dto.response.RoleResponse;
 import dev.anhpd.mapper.RoleMapper;
@@ -10,10 +15,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
-import java.util.HashSet;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -23,7 +24,6 @@ public class RoleServiceImpl implements RoleService {
     RoleRepository roleRepository;
     RoleMapper roleMapper;
     PermissionRepository permissionRepository;
-
 
     @Override
     public RoleResponse create(RoleRequest request) {
