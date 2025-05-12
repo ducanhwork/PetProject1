@@ -22,7 +22,7 @@ public class User {
     @Column(nullable = false)
     private String fullname;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, columnDefinition = ("VARCHAR(255) COLLATE utf8mb4_unicode_ci"))
     private String username;
 
     private String password;

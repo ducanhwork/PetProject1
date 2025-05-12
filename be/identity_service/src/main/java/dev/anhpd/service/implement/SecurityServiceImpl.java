@@ -50,9 +50,11 @@ public class SecurityServiceImpl implements SecurityService {
     @NonFinal
     @Value("${JWT_VALID_DURATION}")
     protected long jwtValidDuration;
+
     @NonFinal
     @Value("${JWT_REFRESH_DURATION}")
     protected long jwtRefreshDuration;
+
     @NonFinal
     @Value("${JWT_SIGNER_KEY}")
     protected String jwtSignerKey;
@@ -98,7 +100,8 @@ public class SecurityServiceImpl implements SecurityService {
                 .issuer("dev.danh")
                 .issueTime(new Date())
                 // thoi gian het han cua token
-                .expirationTime(new Date(Instant.now().plus(jwtValidDuration, ChronoUnit.SECONDS).toEpochMilli()))
+                .expirationTime(new Date(
+                        Instant.now().plus(jwtValidDuration, ChronoUnit.SECONDS).toEpochMilli()))
                 // id cua token
                 .jwtID(UUID.randomUUID().toString())
                 .claim("scope", buildScope(user))
@@ -130,7 +133,6 @@ public class SecurityServiceImpl implements SecurityService {
         } catch (AppException e) {
             log.info("Token already invalidated");
         }
-
     }
 
     /**
@@ -171,10 +173,14 @@ public class SecurityServiceImpl implements SecurityService {
             // parse token
             SignedJWT signedJWT = SignedJWT.parse(token);
             // kiem tra xem token het han chua
-            Date expiration =
-                    (isRefresh) ?
-                            new Date(signedJWT.getJWTClaimsSet().getIssueTime().toInstant().plus(jwtRefreshDuration, ChronoUnit.SECONDS).toEpochMilli()) :
-                            signedJWT.getJWTClaimsSet().getExpirationTime();
+            Date expiration = (isRefresh)
+                    ? new Date(signedJWT
+                            .getJWTClaimsSet()
+                            .getIssueTime()
+                            .toInstant()
+                            .plus(jwtRefreshDuration, ChronoUnit.SECONDS)
+                            .toEpochMilli())
+                    : signedJWT.getJWTClaimsSet().getExpirationTime();
             var verified = signedJWT.verify(verifier);
             if (!verified || !expiration.after(new Date())) {
                 throw new AppException(ErrorCode.INVALID_TOKEN);

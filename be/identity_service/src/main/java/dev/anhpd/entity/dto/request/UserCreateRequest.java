@@ -6,7 +6,6 @@ import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
-import lombok.Builder;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -14,6 +13,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import dev.anhpd.utility.DobConstraint;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
