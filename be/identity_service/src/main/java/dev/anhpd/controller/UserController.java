@@ -28,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 public class UserController {
     UserServiceImpl userService;
+
     // Get All Users
     @GetMapping("/users")
     public ResponseEntity<ApiResponse> getAllUsers() {
@@ -54,6 +55,7 @@ public class UserController {
                 .code(200)
                 .build());
     }
+
     // Update user
     @PutMapping("/update/{user_id}")
     public ResponseEntity<ApiResponse> updateUser(
@@ -65,6 +67,7 @@ public class UserController {
                 .code(200)
                 .build());
     }
+
     // Delete user
     @DeleteMapping("/delete/{user_id}")
     public ResponseEntity<ApiResponse> deleteUser(@PathVariable("user_id") UUID id) throws Exception {
@@ -74,6 +77,7 @@ public class UserController {
                 .code(200)
                 .build());
     }
+
     // Get user by id
     @GetMapping("/get/{user_id}")
     public ResponseEntity<ApiResponse> getUserById(@PathVariable("user_id") UUID id) {
@@ -82,6 +86,15 @@ public class UserController {
                 .message("User found successfully")
                 .data(userResponse)
                 .code(200)
+                .build());
+    }
+
+    @GetMapping("/my-info")
+    ResponseEntity<ApiResponse> getMyInfo() {
+        return ResponseEntity.ok(ApiResponse.builder()
+                .message("My info")
+                .code(200)
+                .data(userService.getMyInfo())
                 .build());
     }
 }

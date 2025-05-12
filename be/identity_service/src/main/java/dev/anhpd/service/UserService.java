@@ -19,4 +19,6 @@ public interface UserService {
     public UserResponse updateUser(UUID uuid, UserUpdateRequest user) throws Exception;
 
     public void deleteUser(UUID id) throws Exception;
+
+    UserResponse getMyInfo();
 }

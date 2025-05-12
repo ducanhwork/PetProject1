@@ -5,6 +5,7 @@ import static lombok.AccessLevel.PRIVATE;
 
 import java.util.*;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -64,10 +65,16 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse createUser(UserCreateRequest request) {
         log.info("Service: create user");
+
         User user = userMapper.fromCreatetoUser(request);
         user.setRoles(Set.of(roleRepository.findById("USER").orElseThrow()));
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        userRepository.save(user);
+        try {
+            userRepository.save(user);
+        } catch (DataIntegrityViolationException e) {
+            throw new AppException(ErrorCode.USER_ALREADY_EXISTS);
+        }
+
         return userMapper.toUserResponse(user);
     }
 
@@ -87,5 +94,13 @@ public class UserServiceImpl implements UserService {
     public void deleteUser(UUID id) throws Exception {
         User us = userRepository.findUserById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         userRepository.delete(us);
+    }
+
+    @Override
+    public UserResponse getMyInfo() {
+        var context = SecurityContextHolder.getContext();
+        String name = context.getAuthentication().getName();
+        User user = userRepository.findByUsername(name).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        return userMapper.toUserResponse(user);
     }
 }

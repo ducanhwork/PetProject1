@@ -2,7 +2,6 @@ package dev.anhpd.entity.dto.response;
 
 import java.time.LocalDate;
 import java.util.Set;
-import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
