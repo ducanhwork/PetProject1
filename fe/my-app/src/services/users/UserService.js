@@ -18,3 +18,13 @@ export const createUser = (username, password, email) => {
     email: email,
   });
 };
+export const getUserById = (id) => {
+  const instance = axios.create({
+    baseURL: REST_API_BASE_URL,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+    },
+  });
+  return instance.get("/users/get/" + id);
+};

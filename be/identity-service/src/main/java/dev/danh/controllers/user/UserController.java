@@ -55,5 +55,14 @@ public class UserController {
                         .build()
         );
     }
+    @GetMapping("/get/{id}")
+    public ResponseEntity<APIResponse> getUserById(@PathVariable UUID id) {
+        return ResponseEntity.ok(
+                APIResponse.builder()
+                        .message("User retrieved successfully")
+                        .data(userService.getUserById(id))
+                        .build()
+        );
+    }
 
 }

@@ -6,11 +6,18 @@ import { useNavigate } from "react-router-dom";
 import SockJS from "sockjs-client";
 import { Stomp } from "@stomp/stompjs";
 import { ToastContainer, toast } from "react-toastify";
+import UserDetailModalComponent from "../user/UserDetailModalComponent";
 const ListUserComponent = () => {
+  const [modalShow, setModalShow] = useState(false);
+  const [userId, setUserId] = useState(null);
   const [stompClient, setStompClient] = useState(null);
   const [messages, setMessages] = useState([]);
   const [users, setUSers] = useState([]);
   const navigate = useNavigate();
+  const handleShow = (userId) => {
+    setUserId(userId);
+    setModalShow(true);
+  };
   useEffect(() => {
     const socket = new SockJS("http://localhost:8080/ws"); // Your Spring endpoint
     const stompClient = Stomp.over(socket);
@@ -52,10 +59,15 @@ const ListUserComponent = () => {
 
   return (
     <div className="row">
-      <SidebarComponent />
-      <div className="container col-8" style={{ marginTop: "70px" }}>
+      <div className="col-2">
+        <SidebarComponent />
+      </div>
+      <div className="container col-10" style={{ marginTop: "70px" }}>
         <h2 className="text-center">List Users</h2>
-        <table className="table table-striped table-bordered w-100">
+        <table
+          className="table table-hover table-bordered"
+          style={{ width: "100%", tableLayout: "fixed" }}
+        >
           <thead>
             <tr>
               <th>ID</th>
@@ -73,6 +85,7 @@ const ListUserComponent = () => {
                 <td>
                   <button
                     className="btn btn-danger"
+                    style={{ marginRight: "10px" }}
                     onClick={() => {
                       // Handle delete action
                       console.log("Delete user with ID:", user.id);
@@ -82,12 +95,21 @@ const ListUserComponent = () => {
                   </button>
                   <button
                     className="btn btn-primary"
+                    style={{ marginRight: "10px" }}
                     onClick={() => {
                       // Handle edit action
                       console.log("Edit user with ID:", user.id);
                     }}
                   >
                     Edit
+                  </button>
+                  <button
+                    className="btn btn-info"
+                    onClick={() => {
+                      handleShow(user.id);
+                    }}
+                  >
+                    View
                   </button>
                 </td>
               </tr>
@@ -96,6 +118,11 @@ const ListUserComponent = () => {
         </table>
       </div>
       <ToastContainer />
+      <UserDetailModalComponent
+        modalShow={modalShow}
+        setModalShow={setModalShow}
+        userId={userId}
+      />
     </div>
   );
 };
