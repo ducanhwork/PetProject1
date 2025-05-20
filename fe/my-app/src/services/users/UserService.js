@@ -28,3 +28,33 @@ export const getUserById = (id) => {
   });
   return instance.get("/users/get/" + id);
 };
+export const updateUser = (id, user) => {
+  const instance = axios.create({
+    baseURL: REST_API_BASE_URL,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+    },
+  });
+  return instance.put("/users/update/" + id, user);
+};
+export const deleteUser = (id) => {
+  const instance = axios.create({
+    baseURL: REST_API_BASE_URL,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+    },
+  });
+  return instance.delete("/users/delete/" + id);
+};
+export const getMyProfile = () => {
+  const instance = axios.create({
+    baseURL: REST_API_BASE_URL,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+    },
+  });
+  return instance.get("/users/myProfile");
+};

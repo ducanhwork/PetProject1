@@ -9,6 +9,7 @@ import LoginComponent from "./components/auth/LoginComponent";
 import RegisterComponent from "./components/auth/RegisterComponent";
 import WebSocketComponent from "./components/socket/WebSocketComponent";
 import HomePageComponent from "./components/common/HomePageComponent";
+import UserProfileComponent from "./components/user/UserProfileComponent";
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -26,9 +27,10 @@ const App = () => {
           setIsLoggedIn={setIsLoggedIn}
         />
         <Routes>
-          <Route path="/" element={<ListUserComponent />} />
+          <Route path="/" element={<HomePageComponent />} />
           <Route path="/socket" element={<WebSocketComponent />} />
           <Route path="/home" element={<HomePageComponent />} />
+          <Route path="/profile" element={<UserProfileComponent />} />
           <Route
             path="/login"
             element={<LoginComponent setIsLoggedIn={setIsLoggedIn} />}
