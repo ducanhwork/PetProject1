@@ -12,21 +12,21 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 const HeaderComponent = (props) => {
-  const { isLoggedIn, setIsLoggedIn } = props;
+  const { isLoggedIn, setIsLoggedIn, userAvatar } = props;
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
 
   const handleLogout = () => {
     logout()
       .then((response) => {
-        console.log(response.data.data);
+        console.log(response.data);
         setIsLoggedIn(false);
+        localStorage.removeItem("access_token");
         navigate("/login");
       })
       .catch((error) => {
         console.log(error);
       });
-    localStorage.removeItem("access_token");
   };
 
   const toggleMenu = () => {
@@ -38,7 +38,7 @@ const HeaderComponent = (props) => {
       <header className="header fixed-top">
         <nav className="navbar navbar-light bg-light justify-content-between px-3">
           <a href="/home" className="navbar-brand">
-            PDANH System
+            EduKationCentor
           </a>
 
           {isLoggedIn ? (
@@ -66,16 +66,24 @@ const HeaderComponent = (props) => {
                       href="/profile"
                       className="nav-link d-flex align-items-center"
                     >
-                      <FontAwesomeIcon
-                        icon={faUser}
-                        className="me-2 text-secondary"
-                      />
+                      {userAvatar ? (
+                        <img
+                          src={userAvatar}
+                          alt="User Avatar"
+                          className="rounded-circle me-2"
+                          style={{ width: "30px", height: "30px" }}
+                        />
+                      ) : (
+                        <FontAwesomeIcon
+                          icon={faUser}
+                          className="me-2 text-secondary"
+                        />
+                      )}
                       My Profile
                     </a>
                   </li>
                   <li className="nav-item my-1">
                     <a
-                      href="/logout"
                       className="nav-link d-flex align-items-center"
                       onClick={handleLogout}
                     >
@@ -90,7 +98,7 @@ const HeaderComponent = (props) => {
               )}
             </div>
           ) : (
-            <div>
+            <div className=" d-flex justify-content-end">
               <a
                 href="/login"
                 className="btn btn-info text-white mx-2 d-flex align-items-center"

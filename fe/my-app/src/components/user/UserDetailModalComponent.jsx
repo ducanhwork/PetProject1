@@ -1,23 +1,27 @@
 import React, { useEffect, useState } from "react";
 import { getUserById } from "../../services/users/UserService";
-
+import { toast } from "react-toastify";
 const UserDetailModalComponent = ({ userId, modalShow, setModalShow }) => {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    if (userId) {
-      getUserById(userId)
-        .then((response) => {
-          setUser(response.data.data);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+    if (modalShow && userId) {
+      setUser(null); // Reset user state when modal opens
+      loadUserDetail(userId); // Load user details when modal is shown
     }
-  }, [userId]);
-
+  }, [modalShow, userId]);
+  const loadUserDetail = async (userId) => {
+    let res = await getUserById(userId);
+    if (res && res.statusCode === 0) {
+      setUser(res.data);
+    } else {
+      toast.warning("Failed to fetch user detail");
+    }
+  };
+  if (!modalShow) return null;
   const handleClose = () => {
     setModalShow(false);
+    setUser(null);
   };
 
   return (
@@ -44,6 +48,13 @@ const UserDetailModalComponent = ({ userId, modalShow, setModalShow }) => {
         <div className="modal-content">
           <div className="modal-header">
             <h5 className="modal-title">User Details</h5>
+            {/* Avatar */}
+            <img
+              src={user?.avatarUrl || "https://placehold.co/600x400"}
+              alt="User Avatar"
+              className="rounded-circle mx-auto mb-3"
+              style={{ width: "120px", height: "120px", objectFit: "cover" }}
+            />
           </div>
           {user ? (
             <div className="modal-body">
@@ -53,17 +64,35 @@ const UserDetailModalComponent = ({ userId, modalShow, setModalShow }) => {
               <p>
                 <b>Username</b>: {user.username}
               </p>
+              <p>
+                <b>Phone</b>: {user.phoneNumber || "N/A"}
+              </p>
+              <p>
+                <b>Full Name</b>: {user.fullName || "N/A"}
+              </p>
+              <p>
+                <b>Date of Birth</b>: {user.dateOfBirth || "N/A"}
+              </p>
+              <p>
+                <b>Address</b>: {user.address || "N/A"}
+              </p>
+              <p>
+                <b>Role</b>:{" "}
+                {user.roles[0].name === "ADMIN" ? (
+                  <span className="badge w-10 bg-danger">Admin</span>
+                ) : user.roles[0].name === "TEACHER" ? (
+                  <span className="badge w-10 bg-success">Teacher</span>
+                ) : (
+                  <span className="badge w-10 bg-secondary">Student</span>
+                )}
+              </p>
               <p className="">
                 <b>Status</b>:{" "}
                 {user.isActive ? (
-                  <span className="text-info">Active</span>
+                  <span className="badge w-10 bg-success">Active</span>
                 ) : (
-                  <span className="text-danger">Inactive</span>
+                  <span className="badge w-10 bg-danger">Inactive</span>
                 )}
-              </p>
-
-              <p>
-                <b>Role</b>: {}
               </p>
             </div>
           ) : (

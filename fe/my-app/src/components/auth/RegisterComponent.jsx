@@ -7,6 +7,11 @@ const RegisterComponent = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
+  const [dateOfBirth, setDateOfBirth] = useState("");
+  const [address, setAddress] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [role, setRole] = useState("STUDENT");
+  // Default role is ROLE_USER
   const handleUsernameChange = (event) => {
     setUsername(event.target.value);
   };
@@ -19,10 +24,17 @@ const RegisterComponent = () => {
   const handleSubmit = (event) => {
     event.preventDefault();
     // Perform registration logic here
-    console.log("Username:", username);
-    console.log("Password:", password);
-    console.log("Email:", email);
-    createUser(username, password, email)
+    const form = require("form-data");
+    const formData = new form();
+    formData.append("username", username);
+    formData.append("password", password);
+    formData.append("email", email);
+    formData.append("dateOfBirth", dateOfBirth);
+    formData.append("address", address);
+    formData.append("phoneNumber", phoneNumber);
+    formData.append("role", role);
+    // Call the createUser service to register the user
+    createUser(formData)
       .then((response) => {
         console.log("Response: ", response.data);
         // Handle successful registration (e.g., redirect to login page)
@@ -37,7 +49,7 @@ const RegisterComponent = () => {
   };
   return (
     <div
-      className="container w-25 card shadow"
+      className="container w-50 card shadow"
       style={{
         marginTop: "10%",
         padding: "20px",
@@ -72,6 +84,45 @@ const RegisterComponent = () => {
           value={email}
           onChange={handleEmailChange}
         />
+        <br />
+        <label htmlFor="dateOfBirth">Date of Birth:</label>
+        <input
+          className="form-control"
+          type="date"
+          id="dateOfBirth"
+          value={dateOfBirth}
+          onChange={(e) => setDateOfBirth(e.target.value)}
+        />
+        <br />
+        <label htmlFor="address">Address:</label>
+        <input
+          className="form-control"
+          type="text"
+          id="address"
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
+        />
+        <br />
+        <label htmlFor="phoneNumber">Phone Number:</label>
+        <input
+          className="form-control"
+          type="text"
+          id="phoneNumber"
+          value={phoneNumber}
+          onChange={(e) => setPhoneNumber(e.target.value)}
+        />
+        <br />
+        <label htmlFor="role">You are:</label>
+        <select
+          className="form-select"
+          id="role"
+          value={role}
+          onChange={(e) => setRole(e.target.value)}
+        >
+          <option value="STUDENT">Student</option>
+          <option value="TEACHER">Teacher</option>
+        </select>
+        <br />
         <button className="btn btn-primary mt-3" type="submit">
           Register
         </button>

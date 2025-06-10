@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import { login } from "../../services/auth/AuthService";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
+import { setWithExpiry } from "utils/localStorageUtil";
 const LoginComponent = (props) => {
-  const { setIsLoggedIn } = props;
+  const { setIsLoggedIn, setUserAvatar } = props;
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const handleUsernameChange = (event) => {
@@ -29,13 +30,25 @@ const LoginComponent = (props) => {
       .then((response) => {
         console.log(response.data);
         // Handle successful login (e.g., store token, redirect, etc.)
-        const token = response.data.data.token; // Adjust based on your API response
+        const token = response.data.token; // Adjust based on your API response
         console.log("Token:", token);
         // Store the token in a cookie or local storage
         if (localStorage.getItem("access_token") !== null) {
           localStorage.removeItem("access_token");
         }
-        localStorage.setItem("access_token", token);
+        setWithExpiry("access_token", token, 60); // Store token with 60 minutes expiry
+        console.log(response.data.userResponse);
+        // Optionally, set user avatar or other user data
+        if (
+          response.data.userResponse &&
+          response.data.userResponse.avatarUrl
+        ) {
+          setUserAvatar(response.data.userResponse.avatarUrl);
+        } else {
+          console.log(">>>>>>>", response.data.userResponse);
+
+          setUserAvatar(null); // Set to null if no avatar is provided
+        }
         setIsLoggedIn(true);
         navigate("/users");
       })
