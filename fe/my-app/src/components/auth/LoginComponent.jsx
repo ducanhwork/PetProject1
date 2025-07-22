@@ -1,12 +1,18 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { login } from "../../services/auth/AuthService";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
-import { setWithExpiry } from "utils/localStorageUtil";
+import { AuthContext } from "../../context/AuthProvider";
+
 const LoginComponent = (props) => {
-  const { setIsLoggedIn, setUserAvatar } = props;
+  const { auth, setAuth } = useContext(AuthContext);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = location?.state?.from?.pathname || "/home";
+  console.log("LoginComponent mounted, from:", from);
+
   const handleUsernameChange = (event) => {
     setUsername(event.target.value);
   };
@@ -15,50 +21,49 @@ const LoginComponent = (props) => {
   };
   const handleRegister = () => {
     // Chuyển hướng đến trang đăng ký
-    window.location.href = "/register";
+    navigate("/register", { replace: true });
   };
 
   const handleForgotPassword = () => {
     // Chuyển hướng đến trang quên mật khẩu
-    window.location.href = "/forgot-password";
+    navigate("/forgot-password", { replace: true });
   };
-  const navigate = useNavigate();
-  const handleLogin = (event) => {
+  const handleLogin = async (event) => {
     event.preventDefault();
+    try {
+      const response = await login(username, password);
+      console.log("Login successful:", response);
+      setAuth(response.data);
+      console.log(auth, "Auth context after login");
 
-    login(username, password)
-      .then((response) => {
-        console.log(response.data);
-        // Handle successful login (e.g., store token, redirect, etc.)
-        const token = response.data.token; // Adjust based on your API response
-        console.log("Token:", token);
-        // Store the token in a cookie or local storage
-        if (localStorage.getItem("access_token") !== null) {
-          localStorage.removeItem("access_token");
-        }
-        setWithExpiry("access_token", token, 60); // Store token with 60 minutes expiry
-        console.log(response.data.userResponse);
-        // Optionally, set user avatar or other user data
-        if (
-          response.data.userResponse &&
-          response.data.userResponse.avatarUrl
-        ) {
-          setUserAvatar(response.data.userResponse.avatarUrl);
-        } else {
-          console.log(">>>>>>>", response.data.userResponse);
-
-          setUserAvatar(null); // Set to null if no avatar is provided
-        }
-        setIsLoggedIn(true);
-        navigate("/users");
-      })
-      .catch((error) => {
-        console.error("Login failed:", error);
-        // Handle error (e.g., show error message)
-        toast.error("Login failed. Please check your username and password.");
-        // Handle login failure (e.g., show error message)
-      });
+      console.log("Setting auth context with:", response.data.data);
+    } catch (error) {
+      console.error("Login failed:", error);
+      if (error.response && error.response.status === 401) {
+        toast.error("Tên đăng nhập hoặc mật khẩu không đúng");
+      }
+    }
   };
+  useEffect(() => {
+    if (from === "/login") {
+      navigate("/home");
+    } else {
+      if (auth?.userResponse) {
+        const roles = auth.userResponse.roles.map((role) => role.name);
+        console.log("User roles:", roles);
+        if (roles.includes("ADMIN")) {
+          navigate("/users");
+        } else if (roles.includes("TEACHER")) {
+          navigate("/teacher/home");
+        } else if (roles.includes("STUDENT")) {
+          navigate("/student/home");
+        } else {
+          navigate(from); // fallback về from nếu có
+        }
+      }
+    }
+  }, [auth?.userResponse, navigate, from]);
+
   return (
     <div
       className="container w-25 card shadow"
@@ -116,5 +121,4 @@ const LoginComponent = (props) => {
     </div>
   );
 };
-
 export default LoginComponent;

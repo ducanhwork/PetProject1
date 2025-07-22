@@ -44,11 +44,6 @@ const ListUserComponent = () => {
       });
   };
   useEffect(() => {
-    const token = localStorage.getItem("access_token");
-    if (!token) {
-      window.location.href = "/login"; // Chưa đăng nhập → chuyển hướng
-      return null;
-    }
     fetchListUser(); // Fetch the user list when the component mounts
     const socket = new SockJS("http://localhost:8080/ws");
     const stompClient = Stomp.over(socket);
