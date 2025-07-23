@@ -18,6 +18,7 @@ public enum ErrorCode {
     UNKNOWN_ERROR( "Unknown error", HttpStatus.INTERNAL_SERVER_ERROR),
     UNAUTHORIZED( "Unauthorized", HttpStatus.UNAUTHORIZED),
     UNAUTHENTICATED( "You do not have access to this api", HttpStatus.FORBIDDEN),
+    FORBIDDEN( "Forbidden", HttpStatus.FORBIDDEN),
     INVALID_TOKEN( "Invalid token", HttpStatus.UNAUTHORIZED);
     private String message;
     private HttpStatus httpStatus;

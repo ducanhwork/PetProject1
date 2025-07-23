@@ -12,18 +12,20 @@ import { Stomp } from "@stomp/stompjs";
 import { ToastContainer, toast } from "react-toastify";
 import UserDetailModalComponent from "../user/UserDetailModalComponent";
 import TableUser from "../common/TableUser";
+import useAuth from "../../hooks/useAuth";
 const ListUserComponent = () => {
   const [modalShow, setModalShow] = useState(false);
   const [userId, setUserId] = useState(null);
   const [stompClient, setStompClient] = useState(null);
   const [users, setUSers] = useState([]);
-
+  const { auth } = useAuth();
+  console.log("ListUserComponent mounted, auth:", auth);
   const handleShow = (userId) => {
     setUserId(userId);
     setModalShow(true);
   };
   const handleDelete = (userId) => {
-    deleteUser(userId)
+    deleteUser(userId, auth?.token)
       .then((response) => {
         toast.success("User was banned successfully");
       })
@@ -34,7 +36,7 @@ const ListUserComponent = () => {
   };
   const handleActive = (userId) => {
     // Implement the logic to activate a user
-    activateUser(userId)
+    activateUser(userId, auth?.token)
       .then((response) => {
         toast.success("User is activated successfully");
       })
@@ -50,9 +52,9 @@ const ListUserComponent = () => {
     stompClient.connect({}, () => {
       stompClient.subscribe("/topic/updates", (message) => {
         if (message.body) {
-          toast.success(
-            ` An user is added or updated: ${JSON.parse(message.body).username}`
-          );
+          // toast.success(
+          //   ` An user is added or updated: ${JSON.parse(message.body).username}`
+          // );
           fetchListUser(); // Refresh the user list after receiving the update
         }
       });
@@ -68,7 +70,7 @@ const ListUserComponent = () => {
     };
   }, []);
   const fetchListUser = async () => {
-    let res = await listUsers();
+    let res = await listUsers(auth?.token);
 
     if (res && res.statusCode === 0) {
       setUSers(res.data);

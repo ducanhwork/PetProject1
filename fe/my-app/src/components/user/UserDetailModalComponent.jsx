@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { getUserById } from "../../services/users/UserService";
 import { toast } from "react-toastify";
+import useAuth from "../../hooks/useAuth";
 const UserDetailModalComponent = ({ userId, modalShow, setModalShow }) => {
   const [user, setUser] = useState(null);
-
+  const { auth } = useAuth();
   useEffect(() => {
     if (modalShow && userId) {
       setUser(null); // Reset user state when modal opens
@@ -11,7 +12,7 @@ const UserDetailModalComponent = ({ userId, modalShow, setModalShow }) => {
     }
   }, [modalShow, userId]);
   const loadUserDetail = async (userId) => {
-    let res = await getUserById(userId);
+    let res = await getUserById(userId, auth?.token);
     if (res && res.statusCode === 0) {
       setUser(res.data);
     } else {

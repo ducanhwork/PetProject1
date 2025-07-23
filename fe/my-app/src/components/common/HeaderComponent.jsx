@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { logout } from "../../services/auth/AuthService";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -10,25 +10,29 @@ import {
   faRightToBracket,
   faUserPlus,
 } from "@fortawesome/free-solid-svg-icons";
+import useAuth from "../../hooks/useAuth";
 
 const HeaderComponent = (props) => {
-  const { isLoggedIn, setIsLoggedIn, userAvatar } = props;
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
-
+  const { auth, setAuth } = useAuth();
+  const avatarUrl = auth?.userResponse?.avatarUrl;
   const handleLogout = () => {
-    logout()
+    logout(auth?.token)
       .then((response) => {
         console.log(response.data);
-        setIsLoggedIn(false);
+        setAuth({});
         localStorage.removeItem("access_token");
+        localStorage.removeItem("user");
         navigate("/login");
       })
       .catch((error) => {
         console.log(error);
       });
   };
-
+  const handleProfileClick = () => {
+    navigate("/profile");
+  };
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
   };
@@ -41,7 +45,7 @@ const HeaderComponent = (props) => {
             EduKationCentor
           </a>
 
-          {isLoggedIn ? (
+          {auth?.userResponse ? (
             <div className="position-relative">
               <FontAwesomeIcon
                 icon={faCircleUser}
@@ -62,13 +66,13 @@ const HeaderComponent = (props) => {
                   }}
                 >
                   <li className="nav-item my-1">
-                    <a
-                      href="/profile"
+                    <Link
+                      to={"/profile"}
                       className="nav-link d-flex align-items-center"
                     >
-                      {userAvatar ? (
+                      {avatarUrl ? (
                         <img
-                          src={userAvatar}
+                          src={avatarUrl}
                           alt="User Avatar"
                           className="rounded-circle me-2"
                           style={{ width: "30px", height: "30px" }}
@@ -80,7 +84,7 @@ const HeaderComponent = (props) => {
                         />
                       )}
                       My Profile
-                    </a>
+                    </Link>
                   </li>
                   <li className="nav-item my-1">
                     <a

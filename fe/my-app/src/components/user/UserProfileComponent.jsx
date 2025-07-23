@@ -1,13 +1,16 @@
 import React, { useEffect } from "react";
 import { getMyProfile } from "../../services/users/UserService";
 import { ToastContainer, toast } from "react-toastify";
+import useAuth from "../../hooks/useAuth";
 const UserProfileComponent = () => {
   const [user, setUser] = React.useState(null);
+  const { auth } = useAuth();
+
   useEffect(() => {
     fetchUserProfile(); // Fetch user profile when the component mounts
   }, []);
   const fetchUserProfile = async () => {
-    let res = await getMyProfile();
+    let res = await getMyProfile(auth?.token);
     if (res && res.statusCode === 0) {
       setUser(res.data);
       console.log("User profile fetched successfully:", res.data);

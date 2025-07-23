@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalDate;
 import java.util.Set;
 import java.util.UUID;
 
@@ -18,13 +19,26 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     UUID id;
+    @Column(columnDefinition = "default 'https://picsum.photos/200'")
+    String avatarUrl;
     @Column(unique = true, nullable = false)
     String username;
     String password;
     @Column(unique = true)
     String email;
+    String fullName;
+    Boolean gender;
+    String phoneNumber;
+    String address;
+    LocalDate dateOfBirth;
     @Column
     Boolean isActive;
     @ManyToMany
     Set<Role> roles;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Student student;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Teacher teacher;
 }

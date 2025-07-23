@@ -3,6 +3,7 @@ package dev.danh.entities.dtos.request;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -12,9 +13,15 @@ import java.util.UUID;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserUpdateRequest {
+    String avatarUrl;
     String username;
     String password;
     String email;
+    String fullName;
+    Boolean gender;
+    String phoneNumber;
+    String address;
+    LocalDate dateOfBirth;
     Boolean isActive;
     List<String> roles;
 }

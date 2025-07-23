@@ -1,11 +1,22 @@
-import { useState, createContext } from "react";
+import { useState, createContext, useEffect } from "react";
 const AuthContext = createContext();
-const AuthProvider = ({ children }) => {
+export const AuthProvider = ({ children }) => {
   const [auth, setAuth] = useState({});
+  useEffect(() => {
+    const token = localStorage.getItem("access_token");
+    const userResponse = localStorage.getItem("user");
+
+    if (token && userResponse) {
+      setAuth({
+        token,
+        userResponse: JSON.parse(userResponse),
+      });
+    }
+  }, []);
   return (
     <AuthContext.Provider value={{ auth, setAuth }}>
       {children}
     </AuthContext.Provider>
   );
 };
-export { AuthContext, AuthProvider };
+export default AuthContext;

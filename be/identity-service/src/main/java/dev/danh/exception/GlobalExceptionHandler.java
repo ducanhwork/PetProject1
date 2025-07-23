@@ -6,6 +6,7 @@ import jakarta.validation.ConstraintViolation;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -83,7 +84,16 @@ public class GlobalExceptionHandler {
                         .statusCode(e.errorCode.getHttpStatus().value())
                         .build());
     }
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ResponseEntity<APIResponse> handleAuthorizationDeniedException(AuthorizationDeniedException e) {
+        ErrorCode errorCode = ErrorCode.FORBIDDEN;
 
+        return ResponseEntity.status(errorCode.getHttpStatus())
+                .body(APIResponse.builder()
+                        .message(errorCode.getMessage())
+                        .statusCode(errorCode.getHttpStatus().value())
+                        .build());
+    }
     private String mapAttribute(String message, Map<String, Object> attributes) {
         String min = attributes.get(MIN_ATTRIBUTE).toString();
         message = message.replace("{" + MIN_ATTRIBUTE + "}", min);

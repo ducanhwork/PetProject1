@@ -25,6 +25,7 @@ public class AuthController {
         return ResponseEntity.ok(APIResponse.builder()
                 .message("Authenticate successfully")
                 .data(response)
+                .statusCode(200)
                 .build());
     }
 
@@ -34,6 +35,7 @@ public class AuthController {
         return ResponseEntity.ok(APIResponse.builder()
                 .message("Introspect successfully")
                 .data(response)
+                .statusCode(200)
                 .build());
     }
 
@@ -42,6 +44,15 @@ public class AuthController {
         authService.logout(request);
         return ResponseEntity.ok(APIResponse.builder()
                 .message("Log out successfully")
+                .statusCode(200)
+                .build());
+    }
+    @PostMapping("/refresh")
+    public ResponseEntity<APIResponse> refreshToken(@RequestBody dev.danh.entities.dtos.request.RefreshRequest request) {
+        var response = authService.refreshToken(request);
+        return ResponseEntity.ok(APIResponse.builder()
+                .message("Refresh token successfully")
+                .data(response)
                 .statusCode(200)
                 .build());
     }

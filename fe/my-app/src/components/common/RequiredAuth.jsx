@@ -2,9 +2,14 @@ import { Navigate, Outlet, useLocation } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 import React from "react";
 
-const RequiredAuth = (acceptRole) => {
-  const auth = useAuth();
+const RequiredAuth = ({ acceptRole }) => {
+  const { auth } = useAuth();
   const location = useLocation();
+  console.log(
+    "Checking authentication and roles",
+    auth?.userResponse?.roles?.find((role) => acceptRole.includes(role.name))
+  );
+
   return auth?.userResponse?.roles?.find((role) =>
     acceptRole.includes(role.name)
   ) ? (
@@ -12,7 +17,7 @@ const RequiredAuth = (acceptRole) => {
   ) : auth?.userResponse ? (
     <Navigate to="/unauthorized" replace state={{ from: location }} />
   ) : (
-    <>Loading ...</>
+    <Navigate to="/login" replace state={{ from: location }} />
   );
 };
 

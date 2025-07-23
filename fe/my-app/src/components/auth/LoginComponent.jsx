@@ -2,10 +2,11 @@ import React, { useContext, useEffect, useState } from "react";
 import { login } from "../../services/auth/AuthService";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
-import { AuthContext } from "../../context/AuthProvider";
+import AuthContext from "../../context/AuthProvider";
+import useAuth from "../../hooks/useAuth";
 
 const LoginComponent = (props) => {
-  const { auth, setAuth } = useContext(AuthContext);
+  const { auth, setAuth } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
@@ -32,7 +33,9 @@ const LoginComponent = (props) => {
     event.preventDefault();
     try {
       const response = await login(username, password);
-      console.log("Login successful:", response);
+      //save token to localStorage
+      // localStorage.setItem("access_token", response.data.token);
+      // localStorage.setItem("user", JSON.stringify(response.data.userResponse));
       setAuth(response.data);
       console.log(auth, "Auth context after login");
 
@@ -52,13 +55,13 @@ const LoginComponent = (props) => {
         const roles = auth.userResponse.roles.map((role) => role.name);
         console.log("User roles:", roles);
         if (roles.includes("ADMIN")) {
-          navigate("/users");
+          navigate("/users", { replace: true });
         } else if (roles.includes("TEACHER")) {
-          navigate("/teacher/home");
+          navigate("/teacher/home", { replace: true });
         } else if (roles.includes("STUDENT")) {
-          navigate("/student/home");
+          navigate("/student/home", { replace: true });
         } else {
-          navigate(from); // fallback về from nếu có
+          navigate(from, { replace: true }); // fallback về from nếu có
         }
       }
     }
