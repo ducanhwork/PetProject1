@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const SidebarComponent = () => {
   return (
@@ -9,14 +10,14 @@ const SidebarComponent = () => {
       <h4 className="text-center mb-4">ADMIN Dashboard</h4>
       <ul className="nav flex-column">
         <li className="nav-item mb-2">
-          <a href="/dashboard" className="nav-link text-white">
+          <Link to="/dashboard" className="nav-link text-white">
             📊 Dashboard
-          </a>
+          </Link>
         </li>
         <li className="nav-item mb-2">
-          <a href="/users" className="nav-link text-white">
+          <Link to="/users" className="nav-link text-white">
             👥 Quản lý người dùng
-          </a>
+          </Link>
         </li>
       </ul>
     </div>

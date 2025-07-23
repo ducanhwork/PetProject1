@@ -23,14 +23,15 @@ import java.util.List;
 @Configuration
 public class SercurityConfig {
     private static final String[] PATH_WHITELIST = {"/auth/*", "/users/create", "/ws/**"};
+    private static final String[] PATH_ADMIN = {"/users/delete/**","/users/update/**","/users/getAll"};
     @Autowired
     private CustomJwtDecoder customJwtDecoder;
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(request -> request.requestMatchers(PATH_WHITELIST)
                         .permitAll()
+                        .requestMatchers(PATH_ADMIN).hasRole("ADMIN")
                         .anyRequest()
                         .authenticated());
 

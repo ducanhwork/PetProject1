@@ -1,16 +1,10 @@
-import axios from "axios";
-const REST_API_BASE_URL = "http://localhost:8080";
-const instance = axios.create({
-  baseURL: REST_API_BASE_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
+import noAuthInstance from "utils/noAuthAxiosCustomize";
+import instance from "utils/axiosCustomize";
 export const login = (username, password) => {
-  return instance.post("/auth/token", { username, password });
+  return noAuthInstance.post("/auth/token", { username, password });
 };
-export const logout = () => {
-  return instance.post("/auth/logout", {
-    token: localStorage.getItem("access_token"),
+export const logout = (token) => {
+  return instance(token).post("/auth/logout", {
+    token: token,
   });
 };

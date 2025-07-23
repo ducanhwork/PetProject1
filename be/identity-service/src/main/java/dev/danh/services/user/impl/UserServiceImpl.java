@@ -3,22 +3,28 @@ package dev.danh.services.user.impl;
 import dev.danh.entities.dtos.request.UserCreateRequest;
 import dev.danh.entities.dtos.request.UserUpdateRequest;
 import dev.danh.entities.dtos.response.UserResponse;
+import dev.danh.entities.models.Role;
+import dev.danh.entities.models.Student;
+import dev.danh.entities.models.Teacher;
 import dev.danh.entities.models.User;
 import dev.danh.enums.ErrorCode;
 import dev.danh.exception.AppException;
 import dev.danh.mapper.UserMapper;
+import dev.danh.repositories.auth.RoleRepository;
 import dev.danh.repositories.user.UserRepository;
 import dev.danh.services.user.UserService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -29,6 +35,7 @@ public class UserServiceImpl implements UserService {
     UserRepository userRepository;
     UserMapper userMapper;
     PasswordEncoder passwordEncoder;
+    RoleRepository roleRepository;
 
     @Override
     public List<UserResponse> getAllUsers() {
@@ -42,8 +49,31 @@ public class UserServiceImpl implements UserService {
     public UserResponse createUser(UserCreateRequest userCreateRequest) {
         User user = new User();
         user = userMapper.toUser(userCreateRequest, user);
+        String roleName = userCreateRequest.getRole().toUpperCase();
+        Role role = roleRepository.findById(roleName)
+                .orElseThrow(() -> new AppException(ErrorCode.UNKNOWN_ERROR));
+        user.setRoles(Set.of(role));
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userMapper.toUserResponse(userRepository.save(user));
+        // Xử lý tạo Student nếu là STUDENT
+        if ("STUDENT".equals(roleName)) {
+            Student student = new Student();
+
+            student.setUser(user); // liên kết user
+            user.setStudent(student);
+        }
+
+        // Hoặc nếu là TEACHER
+        if ("TEACHER".equals(roleName)) {
+            Teacher teacher = new Teacher();
+            teacher.setUser(user);
+            user.setTeacher(teacher);
+        }
+        try {
+            userRepository.save(user);
+        } catch (DataIntegrityViolationException e) {
+            throw new AppException(ErrorCode.USERNAME_OR_EMAIL_ALREADY_EXISTS);
+        }
+        return userMapper.toUserResponse(user);
 
     }
 
@@ -57,11 +87,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deleteUser(UUID userId) {
+    public UserResponse deleteUser(UUID userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         user.setIsActive(false);
         userRepository.save(user);
-        log.info("User with id {} deleted", userId);
+        return userMapper.toUserResponse(user);
     }
 
     @Override
@@ -78,6 +108,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse getUserByEmail(String email) {
         return null;
+    }
+
+    @Override
+    public UserResponse activateUser(UUID userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        user.setIsActive(true);
+        userRepository.save(user);
+        return userMapper.toUserResponse(user);
     }
 
     @Override

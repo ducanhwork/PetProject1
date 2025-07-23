@@ -1,52 +1,84 @@
-import React, {useState} from 'react'
-import { login } from '../../services/auth/AuthService';
-import { useNavigate } from 'react-router-dom';
-const LoginComponent = () => {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const handleUsernameChange = (event) => {
-        setUsername(event.target.value);
-    };
-    const handlePasswordChange = (event) => {
-        setPassword(event.target.value);
-    }
-    const handleRegister = () => {
+import React, { useContext, useEffect, useState } from "react";
+import { login } from "../../services/auth/AuthService";
+import { useNavigate, useLocation } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import AuthContext from "../../context/AuthProvider";
+import useAuth from "../../hooks/useAuth";
+
+const LoginComponent = (props) => {
+  const { auth, setAuth } = useAuth();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = location?.state?.from?.pathname || "/home";
+  console.log("LoginComponent mounted, from:", from);
+
+  const handleUsernameChange = (event) => {
+    setUsername(event.target.value);
+  };
+  const handlePasswordChange = (event) => {
+    setPassword(event.target.value);
+  };
+  const handleRegister = () => {
     // Chuyển hướng đến trang đăng ký
-    window.location.href = '/register';
-    };
+    navigate("/register", { replace: true });
+  };
 
-    const handleForgotPassword = () => {
+  const handleForgotPassword = () => {
     // Chuyển hướng đến trang quên mật khẩu
-    window.location.href = '/forgot-password';
-    };
-    const navigate = useNavigate();
-    const handleLogin = (event) => {
-        event.preventDefault();
-       
-        login(username, password)
-            .then((response) => {
-                console.log(response.data);
-                // Handle successful login (e.g., store token, redirect, etc.)
-                const token = response.data.data.token; // Adjust based on your API response
-                console.log("Token:", token);
-                // Store the token in a cookie or local storage
-                if(localStorage.getItem("access_token") !== null){
-                    localStorage.removeItem("access_token");
-                }
-                localStorage.setItem("access_token", token);
-                navigate("/users");
+    navigate("/forgot-password", { replace: true });
+  };
+  const handleLogin = async (event) => {
+    event.preventDefault();
+    try {
+      const response = await login(username, password);
+      //save token to localStorage
+      // localStorage.setItem("access_token", response.data.token);
+      // localStorage.setItem("user", JSON.stringify(response.data.userResponse));
+      setAuth(response.data);
+      console.log(auth, "Auth context after login");
 
-            })
-            .catch((error) => {
-                console.error("Login failed:", error);
-                // Handle login failure (e.g., show error message)
-                alert("Login failed. Please check your username and password.");
-            });
+      console.log("Setting auth context with:", response.data.data);
+    } catch (error) {
+      console.error("Login failed:", error);
+      if (error.response && error.response.status === 401) {
+        toast.error("Tên đăng nhập hoặc mật khẩu không đúng");
+      }
     }
-    return (
- <div className='container mt-5 w-50'>
+  };
+  useEffect(() => {
+    if (from === "/login") {
+      navigate("/home");
+    } else {
+      if (auth?.userResponse) {
+        const roles = auth.userResponse.roles.map((role) => role.name);
+        console.log("User roles:", roles);
+        if (roles.includes("ADMIN")) {
+          navigate("/users", { replace: true });
+        } else if (roles.includes("TEACHER")) {
+          navigate("/teacher/home", { replace: true });
+        } else if (roles.includes("STUDENT")) {
+          navigate("/student/home", { replace: true });
+        } else {
+          navigate(from, { replace: true }); // fallback về from nếu có
+        }
+      }
+    }
+  }, [auth?.userResponse, navigate, from]);
+
+  return (
+    <div
+      className="container w-25 card shadow"
+      style={{
+        marginTop: "10%",
+        padding: "20px",
+      }}
+    >
+      <ToastContainer />
       <form onSubmit={handleLogin}>
-        <div className='form-group mb-2'>
+        <div className="form-group mb-2">
+          <h1 className="text-center text-info">Sign in</h1>
           <label htmlFor="username">Username</label>
           <input
             type="text"
@@ -57,7 +89,8 @@ const LoginComponent = () => {
             required
           />
         </div>
-        <div className='form-group mb-2'>
+        <br />
+        <div className="form-group mb-2">
           <label htmlFor="password">Password</label>
           <input
             type="password"
@@ -68,18 +101,27 @@ const LoginComponent = () => {
             required
           />
         </div>
-        <div className='d-grid gap-2'>
-          <button type="submit" className="btn btn-primary">Login</button>
-          <button type="button" className="btn btn-secondary" onClick={handleRegister}>
+        <div className="d-grid gap-2">
+          <button type="submit" className="btn btn-primary">
+            Login
+          </button>
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={handleRegister}
+          >
             Đăng ký
           </button>
-          <button type="button" className="btn btn-link" onClick={handleForgotPassword}>
+          <button
+            type="button"
+            className="btn btn-link"
+            onClick={handleForgotPassword}
+          >
             Quên mật khẩu?
           </button>
         </div>
       </form>
     </div>
-      );
-}
-
-export default LoginComponent
+  );
+};
+export default LoginComponent;
