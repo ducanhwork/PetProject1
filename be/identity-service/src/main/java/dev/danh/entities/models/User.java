@@ -1,5 +1,6 @@
 package dev.danh.entities.models;
 
+import dev.danh.enums.AuthProvider;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -41,4 +42,9 @@ public class User {
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Teacher teacher;
+
+    @Enumerated
+    AuthProvider authProvider;
+    @Column(name = "provider_id", nullable = true)
+    String providerId; // ID from the external provider (e.g., Google, Facebook) if applicable
 }
