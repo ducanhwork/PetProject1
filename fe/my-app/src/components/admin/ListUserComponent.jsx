@@ -52,9 +52,6 @@ const ListUserComponent = () => {
     stompClient.connect({}, () => {
       stompClient.subscribe("/topic/updates", (message) => {
         if (message.body) {
-          // toast.success(
-          //   ` An user is added or updated: ${JSON.parse(message.body).username}`
-          // );
           fetchListUser(); // Refresh the user list after receiving the update
         }
       });

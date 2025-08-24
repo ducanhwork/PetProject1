@@ -79,9 +79,9 @@ const UserDetailModalComponent = ({ userId, modalShow, setModalShow }) => {
               </p>
               <p>
                 <b>Role</b>:{" "}
-                {user.roles[0].name === "ADMIN" ? (
+                {user.roles[0]?.name === "ADMIN" ? (
                   <span className="badge w-10 bg-danger">Admin</span>
-                ) : user.roles[0].name === "TEACHER" ? (
+                ) : user.roles[0]?.name === "TEACHER" ? (
                   <span className="badge w-10 bg-success">Teacher</span>
                 ) : (
                   <span className="badge w-10 bg-secondary">Student</span>

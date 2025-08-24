@@ -11,6 +11,9 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -54,6 +57,24 @@ public class AuthController {
                 .message("Refresh token successfully")
                 .data(response)
                 .statusCode(200)
+                .build());
+    }
+    @GetMapping("/login/google")
+    public ResponseEntity<?> googleCallback() {
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Redirect to /oauth2/authorization/google");
+        response.put("url", "/oauth2/authorization/google");
+        return ResponseEntity.ok(APIResponse.builder()
+                .message("Redirect to Google OAuth2 login")
+                .data(response)
+                .statusCode(200)
+                .build());
+    }
+    @GetMapping("/failure")
+    public ResponseEntity<APIResponse> failure(@RequestParam String error) {
+        return ResponseEntity.badRequest().body(APIResponse.builder()
+                .message("Authentication failed: " + error)
+                .statusCode(400)
                 .build());
     }
 

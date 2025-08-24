@@ -24,4 +24,5 @@ public class UserUpdateRequest {
     LocalDate dateOfBirth;
     Boolean isActive;
     List<String> roles;
+
 }

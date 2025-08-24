@@ -1,5 +1,6 @@
 package dev.danh.configs;
 
+import dev.danh.services.auth.impl.Oauth2ServiceImp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,10 +23,14 @@ import java.util.List;
 @EnableWebSecurity
 @Configuration
 public class SercurityConfig {
-    private static final String[] PATH_WHITELIST = {"/auth/*", "/users/create", "/ws/**"};
+    private static final String[] PATH_WHITELIST = {"/auth/*", "/users/create", "/ws/**","/oauth2/**"};
     private static final String[] PATH_ADMIN = {"/users/delete/**","/users/update/**","/users/getAll"};
     @Autowired
     private CustomJwtDecoder customJwtDecoder;
+    @Autowired
+    private Oauth2ServiceImp oauth2ServiceImp;
+    @Autowired
+    private OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -34,7 +39,13 @@ public class SercurityConfig {
                         .requestMatchers(PATH_ADMIN).hasRole("ADMIN")
                         .anyRequest()
                         .authenticated());
-
+    http.oauth2Login(oauth2 -> oauth2
+                .userInfoEndpoint(userInfoEndpoint -> userInfoEndpoint
+                        .userService(oauth2ServiceImp)
+                )
+            .successHandler(oAuth2AuthenticationSuccessHandler)
+            .failureUrl("/auth/login/failure")
+        );
         http.oauth2ResourceServer(oauth2 ->
                 oauth2.jwt(jwtConfigurer -> jwtConfigurer
                         .decoder(customJwtDecoder)

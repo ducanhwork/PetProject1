@@ -26,4 +26,5 @@ public class UserResponse {
     LocalDate dateOfBirth;
     Set<Role> roles;
     Boolean isActive;
+    String authProvider; // Assuming this is a string representation of the AuthProvider enum
 }
