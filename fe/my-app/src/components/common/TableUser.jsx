@@ -25,9 +25,9 @@ const TableUser = (props) => {
               <td>{user.username}</td>
               <td>{user.email}</td>
               <td className="text-center">
-                {user.roles[0].name === "ADMIN" ? (
+                {user.roles[0]?.name === "ADMIN" ? (
                   <span className="badge w-75 bg-danger">Admin</span>
-                ) : user.roles[0].name === "TEACHER" ? (
+                ) : user.roles[0]?.name === "TEACHER" ? (
                   <span className="badge w-75 bg-success">Teacher</span>
                 ) : (
                   <span className="badge w-75 bg-secondary">Student</span>

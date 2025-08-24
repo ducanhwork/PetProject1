@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { login } from "../../services/auth/AuthService";
+import { getMyProfile } from "../../services/users/UserService";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import AuthContext from "../../context/AuthProvider";
@@ -29,6 +30,9 @@ const LoginComponent = (props) => {
     // Chuyển hướng đến trang quên mật khẩu
     navigate("/forgot-password", { replace: true });
   };
+  const handleLoginWithGoogle = () => {
+    window.location.href = "http://localhost:8080/auth/login/google";
+  };
   const handleLogin = async (event) => {
     event.preventDefault();
     try {
@@ -47,6 +51,12 @@ const LoginComponent = (props) => {
       }
     }
   };
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const token = params.get("token");
+    const response = getMyProfile(token);
+    setAuth({ token, userResponse: response.data });
+  }, [location.search]);
   useEffect(() => {
     if (from === "/login") {
       navigate("/home");
@@ -104,6 +114,13 @@ const LoginComponent = (props) => {
         <div className="d-grid gap-2">
           <button type="submit" className="btn btn-primary">
             Login
+          </button>
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={handleLoginWithGoogle}
+          >
+            Login With Goole
           </button>
           <button
             type="button"
